@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星盘生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select, button {
+            padding: 8px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px; /* 按钮之间的间距 */
+            margin-top: 10px;
+        }
+        .button-container button {
+            flex: 1; /* 按钮平均分配宽度 */
+        }
+    </style>
+</head>
+<body>
+<h1>星盘生成器</h1>
+<form id="astroForm">
+    <label for="birthday">公历生日:</label>
+    <input type="date" id="birthday" name="birthday" required>
+
+    <label for="time">时辰:</label>
+    <select id="time" name="time" required>
+        <option value="0">子时 (23:00-01:00)</option>
+        <option value="1">丑时 (01:00-03:00)</option>
+        <option value="2">寅时 (03:00-05:00)</option>
+        <option value="3">卯时 (05:00-07:00)</option>
+        <option value="4">辰时 (07:00-09:00)</option>
+        <option value="5">巳时 (09:00-11:00)</option>
+        <option value="6">午时 (11:00-13:00)</option>
+        <option value="7">未时 (13:00-15:00)</option>
+        <option value="8">申时 (15:00-17:00)</option>
+        <option value="9">酉时 (17:00-19:00)</option>
+        <option value="10">戌时 (19:00-21:00)</option>
+        <option value="11">亥时 (21:00-23:00)</option>
+    </select>
+
+    <label for="gender">性别:</label>
+    <select id="gender" name="gender" required>
+        <option value="男">男</option>
+        <option value="女">女</option>
+    </select>
+
+    <div class="button-container">
+        <button type="submit">生成星盘</button>
+        <button type="button" id="copyButton">复制结果</button>
+    </div>
+</form>
+
+<div id="result"></div>
+
+<script>
+    document.getElementById('astroForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const birthday = document.getElementById('birthday').value;
+        const time = document.getElementById('time').value;
+        const gender = document.getElementById('gender').value;
+
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ birthday, time, gender }),
+        });
+
+        const data = await response.json();
+        document.getElementById('result').textContent = data.result;
+    });
+
+    // 复制结果功能
+    document.getElementById('copyButton').addEventListener('click', function () {
+        const resultText = document.getElementById('result').textContent;
+        if (resultText) {
+            navigator.clipboard.writeText(resultText)
+                .then(() => {
+                    alert('结果已复制到剪贴板！');
+                })
+                .catch(() => {
+                    alert('复制失败，请手动复制结果。');
+                });
+        } else {
+            alert('没有可复制的内容！');
+        }
+    });
+</script>
+</body>
+</html>
